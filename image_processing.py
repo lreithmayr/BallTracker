@@ -20,8 +20,10 @@ def track_roi(tracker, frame, initBB, pts):
                     continue
                 thickness = int(np.sqrt(64 / float(i + 1)) * 2.5)
                 cv2.line(frame, pts[i - 1], pts[i], (0, 255, 0), thickness)
+        else:
+            cv2.putText(frame, "Tracking Failed", (200, 400), fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=1, color=(255, 0, 0), thickness=3)
     cv2.imshow("Frame", frame)
-    if cv2.waitKey(20) & 0xFF == ord("s"):
+    if cv2.waitKey(70) & 0xFF == ord("s"):
         initBB = cv2.selectROI("Frame", frame, fromCenter=False, showCrosshair=True)
         tracker.init(frame, initBB)
     if cv2.waitKey(1) == 27:

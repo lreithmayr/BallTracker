@@ -13,7 +13,6 @@ if __name__ == "__main__":
     tracker = cv2.TrackerCSRT_create()
     while True:
         check, frame = cap.read()
-        frame
         tracker, initBB = track_roi(tracker, frame, initBB, pts)
         if cv2.waitKey(1) == 27:
             sys.exit()
