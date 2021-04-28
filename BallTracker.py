@@ -1,6 +1,12 @@
+import pathlib
+import os
 import cv2
 import sys
 import numpy as np
+
+current_dir = pathlib.Path(__file__).parent.absolute()
+vid = os.path.join(current_dir, "shot2.mp4")
+pts = []
 
 def track_roi(tracker, frame, initBB, pts):
     if frame is None:
@@ -23,9 +29,21 @@ def track_roi(tracker, frame, initBB, pts):
         else:
             cv2.putText(frame, "Tracking Failed", (200, 400), fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=1, color=(255, 0, 0), thickness=3)
     cv2.imshow("Frame", frame)
-    if cv2.waitKey(70) & 0xFF == ord("s"):
+    if cv2.waitKey(80) & 0xFF == ord("s"):
         initBB = cv2.selectROI("Frame", frame, fromCenter=False, showCrosshair=True)
         tracker.init(frame, initBB)
     if cv2.waitKey(1) == 27:
         sys.exit()
     return tracker, initBB
+
+if __name__ == "__main__":
+    cap = cv2.VideoCapture(vid)
+    initBB = None
+    tracker = cv2.TrackerCSRT_create()
+    while True:
+        check, frame = cap.read()
+        tracker, initBB = track_roi(tracker, frame, initBB, pts)
+        if cv2.waitKey(1) == 27:
+            sys.exit()
+    cap.release()
+    cv2.destroyAllWindows()
