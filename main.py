@@ -7,7 +7,7 @@ pts = []
 
 if __name__ == "__main__":
     current_dir = pathlib.Path(__file__).parent.absolute()
-    vid = os.path.join(current_dir, "shot.mp4")
+    vid = os.path.join(current_dir, "shot2.mp4")
     cap = cv2.VideoCapture(vid)
     initBB = None
     tracker = cv2.TrackerCSRT_create()
