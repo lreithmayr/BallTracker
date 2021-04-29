@@ -4,14 +4,10 @@ import cv2
 import sys
 import numpy as np
 from pykalman import KalmanFilter
+import matplotlib.pyplot as plt
 
-current_dir = pathlib.Path(__file__).parent.absolute()
-vid = os.path.join(current_dir, "shot2.mp4")
-pts = []
 
 def track_roi(tracker, frame, init_bb, pts, frame_nr):
-    if frame is None:
-        sys.exit()
     if init_bb is not None:
         (success, box) = tracker.update(frame)
         if success:
@@ -35,27 +31,43 @@ def track_roi(tracker, frame, init_bb, pts, frame_nr):
         tracker.init(frame, init_bb)
     if cv2.waitKey(1) == 27:
         sys.exit()
-    return tracker, init_bb
-
-# def trajectory_predictor():
+    return tracker, init_bb, pts
 
 
+def plot_track(pts):
+    # pts_flipped = np.flip(pts)
+    for pt in pts:
+        plt.scatter(pt[0], pt[1])
+    plt.show()
 
 
-if __name__ == "__main__":
+def main():
+    current_dir = pathlib.Path(__file__).parent.absolute()
+    vid = os.path.join(current_dir, "shot2.mp4")
+    pts = []
+
     cap = cv2.VideoCapture(vid)
-    timestamps = []
+    num_of_frames = cap.get(cv2.CAP_PROP_FRAME_COUNT)
+    # timestamps = []
     tracker = cv2.TrackerCSRT_create()
     init_bb = None
 
     while True:
         check, frame = cap.read()
         t = np.around((cap.get(cv2.CAP_PROP_POS_MSEC) / 1000), 2)
-        fps = cap.get(cv2.CAP_PROP_FPS)
-        frame_nr =int(cap.get(cv2.CAP_PROP_POS_FRAMES))
+        fps = np.around(cap.get(cv2.CAP_PROP_FPS), 2)
+        frame_nr = int(cap.get(cv2.CAP_PROP_POS_FRAMES))
         print([t, fps, frame_nr])
-        tracker, init_bb = track_roi(tracker, frame, init_bb, pts, frame_nr)
+        tracker, init_bb, pts = track_roi(tracker, frame, init_bb, pts, frame_nr)
         if cv2.waitKey(1) == 27:
+            break
+        if frame_nr == num_of_frames:
             break
     cap.release()
     cv2.destroyAllWindows()
+
+    plot_track(pts)
+
+
+if __name__ == "__main__":
+    main()
