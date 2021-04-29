@@ -3,15 +3,16 @@ import os
 import cv2
 import sys
 import numpy as np
+from pykalman import KalmanFilter
 
 current_dir = pathlib.Path(__file__).parent.absolute()
 vid = os.path.join(current_dir, "shot2.mp4")
 pts = []
 
-def track_roi(tracker, frame, initBB, pts):
+def track_roi(tracker, frame, init_bb, pts, frame_nr):
     if frame is None:
         sys.exit()
-    if initBB is not None:
+    if init_bb is not None:
         (success, box) = tracker.update(frame)
         if success:
             (x, y, w, h) = [int(v) for v in box]
@@ -29,21 +30,32 @@ def track_roi(tracker, frame, initBB, pts):
         else:
             cv2.putText(frame, "Tracking Failed", (200, 400), fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=1, color=(255, 0, 0), thickness=3)
     cv2.imshow("Frame", frame)
-    if cv2.waitKey(80) & 0xFF == ord("s"):
-        initBB = cv2.selectROI("Frame", frame, fromCenter=False, showCrosshair=True)
-        tracker.init(frame, initBB)
+    if frame_nr == 1:
+        init_bb = cv2.selectROI("Frame", frame, fromCenter=False, showCrosshair=True)
+        tracker.init(frame, init_bb)
     if cv2.waitKey(1) == 27:
         sys.exit()
-    return tracker, initBB
+    return tracker, init_bb
+
+# def trajectory_predictor():
+
+
+
 
 if __name__ == "__main__":
     cap = cv2.VideoCapture(vid)
-    initBB = None
+    timestamps = []
     tracker = cv2.TrackerCSRT_create()
+    init_bb = None
+
     while True:
         check, frame = cap.read()
-        tracker, initBB = track_roi(tracker, frame, initBB, pts)
+        t = np.around((cap.get(cv2.CAP_PROP_POS_MSEC) / 1000), 2)
+        fps = cap.get(cv2.CAP_PROP_FPS)
+        frame_nr =int(cap.get(cv2.CAP_PROP_POS_FRAMES))
+        print([t, fps, frame_nr])
+        tracker, init_bb = track_roi(tracker, frame, init_bb, pts, frame_nr)
         if cv2.waitKey(1) == 27:
-            sys.exit()
+            break
     cap.release()
     cv2.destroyAllWindows()
