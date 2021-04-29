@@ -3,11 +3,11 @@ import os
 import cv2
 import sys
 import numpy as np
-from pykalman import KalmanFilter
+# from pykalman import KalmanFilter
 import matplotlib.pyplot as plt
 
 
-def track_roi(tracker, frame, init_bb, pts, frame_nr):
+def track_ball(tracker, frame, init_bb, pts, frame_nr):
     if init_bb is not None:
         (success, box) = tracker.update(frame)
         if success:
@@ -24,7 +24,8 @@ def track_roi(tracker, frame, init_bb, pts, frame_nr):
                 thickness = int(np.sqrt(64 / float(i + 1)) * 2.5)
                 cv2.line(frame, pts[i - 1], pts[i], (0, 255, 0), thickness)
         else:
-            cv2.putText(frame, "Tracking Failed", (200, 400), fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=1, color=(255, 0, 0), thickness=3)
+            cv2.putText(frame, "Tracking Failed", (200, 400), fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=1,
+                        color=(255, 0, 0), thickness=3)
     cv2.imshow("Frame", frame)
     if frame_nr == 1:
         init_bb = cv2.selectROI("Frame", frame, fromCenter=False, showCrosshair=True)
@@ -35,10 +36,20 @@ def track_roi(tracker, frame, init_bb, pts, frame_nr):
 
 
 def plot_track(pts):
-    # pts_flipped = np.flip(pts)
     for pt in pts:
-        plt.scatter(pt[0], pt[1])
+        y_neg = np.negative(pt[1])
+        plt.scatter(pt[0], y_neg)
     plt.show()
+
+
+def predict_trajectory(pts):
+    if len(pts) < 2:
+        return
+    dx = pts[-1][0] - pts[-2][0]
+    dy = pts[-1][1] - pts[-2][1]
+
+    print([pts[-1][0], pts[-2][0]])
+    print([dx, dy])
 
 
 def main():
@@ -58,7 +69,8 @@ def main():
         fps = np.around(cap.get(cv2.CAP_PROP_FPS), 2)
         frame_nr = int(cap.get(cv2.CAP_PROP_POS_FRAMES))
         print([t, fps, frame_nr])
-        tracker, init_bb, pts = track_roi(tracker, frame, init_bb, pts, frame_nr)
+        tracker, init_bb, pts = track_ball(tracker, frame, init_bb, pts, frame_nr)
+        predict_trajectory(pts)
         if cv2.waitKey(1) == 27:
             break
         if frame_nr == num_of_frames:
