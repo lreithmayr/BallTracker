@@ -1,10 +1,8 @@
 import pathlib
 import cv2
-import sys
 import numpy as np
 # from pykalman import KalmanFilter
 import matplotlib.pyplot as plt
-import imutils
 import os
 
 
@@ -50,7 +48,7 @@ def predict_trajectory(pts):
     print([dx, dy])
 
 
-def main():
+if __name__ == "__main__":
     current_dir = pathlib.Path(__file__).parent.absolute()
     vid = os.path.join(current_dir, "shot2.mp4")
     pts = []
@@ -76,7 +74,3 @@ def main():
     cv2.destroyAllWindows()
 
     plot_track(pts)
-
-
-if __name__ == "__main__":
-    main()
