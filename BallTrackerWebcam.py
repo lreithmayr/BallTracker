@@ -5,29 +5,41 @@ import matplotlib.pyplot as plt
 import imutils
 
 
-def contour_tracker(tracker, frame, init_bb, pts):
-    if init_bb is not None:
-        (success, box) = tracker.update(frame)
-        if success:
-            (x, y, w, h) = [int(v) for v in box]
-            cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), thickness=2)
-            x_center = int(x + (w / 2))
-            y_center = int(y + (h / 2))
-            cv2.circle(frame, (x_center, y_center), 0, (0, 255, 0), thickness=2)
-            pt = (x_center, y_center)
-            pts.append(pt)
-            for i in range(1, len(pts)):
-                if pts[i - 1] is None or pts[i] is None:
-                    continue
-                cv2.line(frame, pts[i - 1], pts[i], (0, 255, 0), thickness=1)
-        else:
-            cv2.putText(frame, "Tracking Failed", (200, 400), fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=1,
-                        color=(255, 0, 0), thickness=3)
+def track_contours(frame, pts):
+    lower_thr = (29, 86, 6)
+    upper_thr = (64, 255, 255)
 
-    if cv2.waitKey(1) == ord("s"):
-        init_bb = cv2.selectROI("Frame", frame, fromCenter=False, showCrosshair=True)
-        tracker.init(frame, init_bb)
-    return tracker, init_bb, pts
+    blurred = cv2.GaussianBlur(frame, (11, 11), 0)
+    hsv = cv2.cvtColor(blurred, cv2.COLOR_BGR2HSV)
+    mask = cv2.inRange(hsv, lower_thr, upper_thr)
+    mask = cv2.erode(mask, None, iterations=2)
+    mask = cv2.dilate(mask, None, iterations=2)
+
+    cntrs = cv2.findContours(mask.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    cntrs = imutils.grab_contours(cntrs)
+    center = None
+
+    if len(cntrs) > 0:
+        print("Works")
+        c = max(cntrs, key=cv2.contourArea)
+        ((x, y), radius) = cv2.minEnclosingCircle(c)
+        M = cv2.moments(c)
+        center = (int(M["m10"] / M["m00"]), int(M["m01"] / M["m00"]))
+
+        if radius > 10:
+            cv2.circle(frame, (int(x), int(y)), int(radius), (0, 255, 255), 2)
+            cv2.circle(frame, center, 5, (0, 0, 255), -1)
+    else:
+        print ("Fail")
+
+    pts.append(center)
+
+    for i in range(1, len(pts)):
+        if pts[i - 1] is None or pts[i] is None:
+            continue
+        cv2.line(frame, pts[i - 1], pts[i], (0, 255, 0), thickness=1)
+
+    return pts, frame, mask
 
 
 def plot_track(pts):
@@ -45,12 +57,12 @@ if __name__ == "__main__":
 
     while True:
         check, frame = cap.read()
-        frame = imutils.resize(frame, 1000, 1000)
-        cv2.imshow("Frame", frame)
-        tracker, init_bb, pts = contour_tracker(tracker, frame, init_bb, pts)
+        frame = imutils.resize(frame, 700, 700)
+        pts, frame, mask = track_contours(frame, pts)
+        cv2.imshow("Frame", mask)
         if cv2.waitKey(1) == 27:
             break
     cap.release()
     cv2.destroyAllWindows()
 
-    plot_track(pts)
+    # plot_track(pts)
