@@ -6,10 +6,10 @@ import imutils
 from collections import deque
 
 
-class ContourTracker(object):
+class Tracker(object):
 
     def __init__(self):
-        self.pts = deque(maxlen=64)
+        self.pts = deque(maxlen=128)
 
     def track_contours(self, cam_frame):
         lt = np.array([65, 33, 71])
@@ -52,7 +52,7 @@ class ContourTracker(object):
 if __name__ == "__main__":
     vid = "http://192.168.0.94:8080/video"
     cap = cv2.VideoCapture(vid)
-    tracker = ContourTracker()
+    tracker = Tracker()
 
     while True:
         check, frame = cap.read()
