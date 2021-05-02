@@ -3,15 +3,17 @@ import numpy as np
 # from pykalman import KalmanFilter
 import matplotlib.pyplot as plt
 import imutils
+from collections import deque
 
 
 def track_contours(frame, pts):
-    lower_thr = (29, 86, 6)
-    upper_thr = (64, 255, 255)
+
+    lt = np.array([65, 33, 71])
+    ut = np.array([90, 176, 255])
 
     blurred = cv2.GaussianBlur(frame, (11, 11), 0)
     hsv = cv2.cvtColor(blurred, cv2.COLOR_BGR2HSV)
-    mask = cv2.inRange(hsv, lower_thr, upper_thr)
+    mask = cv2.inRange(hsv, lt, ut)
     mask = cv2.erode(mask, None, iterations=2)
     mask = cv2.dilate(mask, None, iterations=2)
 
@@ -32,14 +34,15 @@ def track_contours(frame, pts):
     else:
         print ("Fail")
 
-    pts.append(center)
+    pts.appendleft(center)
 
     for i in range(1, len(pts)):
         if pts[i - 1] is None or pts[i] is None:
             continue
-        cv2.line(frame, pts[i - 1], pts[i], (0, 255, 0), thickness=1)
+        thickness = int(np.sqrt(64 / float(i + 1)) * 2.5)
+        cv2.line(frame, pts[i - 1], pts[i], (0, 255, 0), thickness)
 
-    return pts, frame, mask
+    return frame, pts
 
 
 def plot_track(pts):
@@ -51,18 +54,20 @@ def plot_track(pts):
 
 if __name__ == "__main__":
     vid = "http://192.168.0.94:8080/video"
-    pts = []
+    pts = deque(maxlen=64)
 
     cap = cv2.VideoCapture(vid)
 
     while True:
         check, frame = cap.read()
-        frame = imutils.resize(frame, 700, 700)
-        pts, frame, mask = track_contours(frame, pts)
-        cv2.imshow("Frame", mask)
+        frame = imutils.resize(frame, int(1920/1.5), int(1080/1.5))
+        frame, pts = track_contours(frame, pts)
+        cv2.imshow("Frame", frame)
         if cv2.waitKey(1) == 27:
             break
     cap.release()
     cv2.destroyAllWindows()
 
-    # plot_track(pts)
+    print(pts)
+
+    plot_track(pts)
