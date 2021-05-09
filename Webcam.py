@@ -13,7 +13,6 @@ if __name__ == "__main__":
         tracked_frame = tracker.track_contours(frame)
         pos = tracker.get_position()
         vel = tracker.get_velocity()
-        print(vel[-1])
         cv2.imshow("Frame", tracked_frame)
         if cv2.waitKey(1) == 27:
             break

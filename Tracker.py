@@ -12,6 +12,8 @@ class Tracker(object):
         self.position = deque(maxlen=128)
         self.velocity = deque(maxlen=128)
         self.velocity.append(None)
+        self.accel = deque(maxlen=128)
+        self.accel.append(None)
 
     def track_contours(self, cam_frame):
         lt = np.array([65, 33, 71])
@@ -58,10 +60,23 @@ class Tracker(object):
         if len(self.get_position()) > 1:
             dx = self.position[-1][0] - self.position[-2][0]
             dy = self.position[-1][1] - self.position[-2][1]
-            v_x = dx / dt
+            v_x = dx/dt
             v_y = dy/dt
             self.velocity.append((v_x, v_y))
 
     def get_velocity(self):
         self.compute_velocity()
         return self.velocity
+
+    def compute_accel(self):
+        fps = self.cap.get(cv2.CAP_PROP_FPS)
+        dt = 1 / fps
+        vel = self.velocity
+        if len(vel) > 2:
+            acc_x = (vel[-1][0] - vel[-2][0]) / dt
+            acc_y = (vel[-1][1] - vel[-2][1]) / dt
+            self.accel.append((acc_x, acc_y))
+
+    def get_accel(self):
+        self.compute_accel()
+        return self.accel
