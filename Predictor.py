@@ -1,6 +1,14 @@
 from pykalman import KalmanFilter
 from Tracker import Tracker
+import numpy as np
 
 class Predictor(object):
-    # Define state vector for Karman filter
-    x_k = (x, x_dot, y, y_dot)
+
+    def __init__(self):
+        self.transition_matrix = [[1, 0, 1, 0], [0, 1, 0, 1]]
+        self.observation_matrix = [[1, 0, 0, 0], [0, 1, 0, 0]]
+
+    def filter(self):
+
+
+        kf = KalmanFilter(self.transition_matrix, self.observation_matrix,)
