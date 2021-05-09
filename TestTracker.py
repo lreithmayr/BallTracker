@@ -17,7 +17,5 @@ class TestTracker(unittest.TestCase):
         self.assertEqual(self.tracker.get_accel(), deque([None, (208, -234)]))
 
 
-
-
 if __name__ == '__main__':
     unittest.main(verbosity=2)
