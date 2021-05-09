@@ -53,13 +53,14 @@ class Tracker(object):
         return self.position
 
     def compute_velocity(self):
-        fps = self.cap.get(cv2.CAP_PROP_FPS)
-        dt = 1 / fps
+        # fps = self.cap.get(cv2.CAP_PROP_FPS)
+        # dt = 1 / fps
+        dt = 0.5
         if len(self.get_position()) > 1:
             dx = self.position[-1][0] - self.position[-2][0]
             dy = self.position[-1][1] - self.position[-2][1]
             v_x = dx / dt
-            v_y = -(dy/dt)
+            v_y = dy/dt
             self.velocity.append((v_x, v_y))
 
     def get_velocity(self):
