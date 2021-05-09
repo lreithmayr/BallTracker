@@ -25,9 +25,7 @@ if __name__ == "__main__":
         cv2.imshow("Frame", tracked_frame)
         if len(pos) > 1:
             x_init = pos[-1][0]
-            print(x_init)
             y_init = pos[-1][1]
-            print(y_init)
             v_x_init = vel[-1][0]
             v_y_init = vel[-1][1]
             init_state = [x_init, y_init, v_x_init, v_y_init]
