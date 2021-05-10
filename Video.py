@@ -21,9 +21,8 @@ if __name__ == "__main__":
         frame_nr = cap.get(cv2.CAP_PROP_POS_FRAMES)
         if tracker.init_bb is not None:
             frame, pos = tracker.track_roi(frame)
-            # print(pos, pos[0], pos[1])
             pred_pos = kf.estimate_position(pos[0], pos[1])
-            cv2.circle(frame, (pred_pos[0], pred_pos[1]), 20, [0,255,255], 2, 8)
+            cv2.circle(frame, (pred_pos[0], pred_pos[1]), 20, [0, 255, 255], 2, 8)
             cv2.imshow("Frame", frame)
         if frame_nr == 1:
             cv2.imshow("Frame", frame) 

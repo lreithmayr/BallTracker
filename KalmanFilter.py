@@ -8,8 +8,8 @@ class KalmanFilter(object):
         self.kf = cv2.KalmanFilter(4, 2)
         self.kf.transitionMatrix = np.array([[1, 0, 1, 0], [0, 1, 0, 1], [0, 0, 1, 0], [0, 0, 0, 1]], np.float32)
         self.kf.measurementMatrix = np.array([[1, 0, 0, 0], [0, 1, 0, 0]], np.float32)
-        self.kf.processNoiseCov = 1e-5
-        self.kf.measurementNoiseCov =
+        # self.kf.processNoiseCov = 1e-5 * np.eye(4, 2)
+        # self.kf.measurementNoiseCov = 1e-1 * np.eye(4, 2)
 
     def estimate_position(self, pos_x, pos_y):
         measured = np.array([[np.float32(pos_x)], [np.float32(pos_y)]])

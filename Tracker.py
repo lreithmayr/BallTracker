@@ -10,12 +10,9 @@ class Tracker(object):
     def __init__(self, cap):
         self.cap = cap
         self.position = deque(maxlen=128)
-        self.velocity = deque(maxlen=128)
-        self.velocity.append(None)
-        self.accel = deque(maxlen=128)
-        self.accel.append(None)
         self.roi_tracker = cv2.TrackerCSRT_create()
         self.init_bb = None
+        self.center = None
 
     def track_contours(self, cam_frame):
         lt = np.array([65, 33, 71])
@@ -33,19 +30,14 @@ class Tracker(object):
             c = max(cntrs, key=cv2.contourArea)
             ((x, y), radius) = cv2.minEnclosingCircle(c)
             moments = cv2.moments(c)
-            center = (int(moments["m10"] / moments["m00"]), int(moments["m01"] / moments["m00"]))
-            self.position.append(center)
+            self.center = (int(moments["m10"] / moments["m00"]), int(moments["m01"] / moments["m00"]))
+            self.position.append(self.center)
 
             if radius > 10:
                 cv2.circle(cam_frame, (int(x), int(y)), int(radius), (0, 255, 255), 2)
-                cv2.circle(cam_frame, center, 5, (0, 0, 255), -1)
+                cv2.circle(cam_frame, self.center, 5, (0, 0, 255), -1)
 
-        # for i in range(1, len(self.position)):
-        #     if self.position[i - 1] is None or self.position[i] is None:
-        #         continue
-        #     thickness = int(np.sqrt(64 / float(i + 1)) * 2.5)
-        #     cv2.line(cam_frame, self.position[i - 1], self.position[i], (0, 255, 0), thickness)
-        return cam_frame
+        return cam_frame, self.center
 
     def track_roi(self, cam_frame):
         (success, box) = self.roi_tracker.update(cam_frame)
@@ -72,33 +64,3 @@ class Tracker(object):
             y_neg = np.negative(pos[1])
             plt.scatter(pos[0], y_neg)
         plt.show()
-
-    def get_position(self):
-        return self.position
-
-    def get_velocity(self):
-        self.compute_velocity()
-        return self.velocity
-
-    def get_accel(self):
-        self.compute_accel()
-        return self.accel
-
-    def compute_velocity(self):
-        fps = self.cap.get(cv2.CAP_PROP_FPS)
-        dt = 1 / fps
-        if len(self.get_position()) > 1:
-            dx = self.position[-1][0] - self.position[-2][0]
-            dy = self.position[-1][1] - self.position[-2][1]
-            v_x = dx/dt
-            v_y = dy/dt
-            self.velocity.append((v_x, v_y))
-
-    def compute_accel(self):
-        fps = self.cap.get(cv2.CAP_PROP_FPS)
-        dt = 1 / fps
-        vel = self.velocity
-        if len(vel) > 2:
-            acc_x = (vel[-1][0] - vel[-2][0]) / dt
-            acc_y = (vel[-1][1] - vel[-2][1]) / dt
-            self.accel.append((acc_x, acc_y))
