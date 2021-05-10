@@ -2,6 +2,7 @@ import pathlib
 import cv2
 import os
 from Tracker import Tracker
+from KalmanFilter import KalmanFilter
 import imutils
 
 if __name__ == "__main__":
@@ -9,8 +10,8 @@ if __name__ == "__main__":
     vid = os.path.join(current_dir, "shot2.mp4")
 
     cap = cv2.VideoCapture(vid)
-    num_of_frames = cap.get(cv2.CAP_PROP_FRAME_COUNT)
     tracker = Tracker(cap)
+    kf = KalmanFilter()
 
     while True:
         check, frame = cap.read()
@@ -19,7 +20,10 @@ if __name__ == "__main__":
         frame = imutils.resize(frame, 1000, 500)
         frame_nr = cap.get(cv2.CAP_PROP_POS_FRAMES)
         if tracker.init_bb is not None:
-            frame = tracker.track_roi(frame)
+            frame, pos = tracker.track_roi(frame)
+            # print(pos, pos[0], pos[1])
+            pred_pos = kf.estimate_position(pos[0], pos[1])
+            cv2.circle(frame, (pred_pos[0], pred_pos[1]), 20, [0,255,255], 2, 8)
             cv2.imshow("Frame", frame)
         if frame_nr == 1:
             cv2.imshow("Frame", frame) 
@@ -31,5 +35,4 @@ if __name__ == "__main__":
 
     cap.release()
     cv2.destroyAllWindows()
-
     tracker.plot_track()

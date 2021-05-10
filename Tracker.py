@@ -47,12 +47,6 @@ class Tracker(object):
         #     cv2.line(cam_frame, self.position[i - 1], self.position[i], (0, 255, 0), thickness)
         return cam_frame
 
-    def set_init_bb(self, init_bb):
-        self.init_bb = init_bb
-
-    def init_roi_tracker(self, cam_frame):
-        self.roi_tracker.init(cam_frame, self.init_bb)
-
     def track_roi(self, cam_frame):
         (success, box) = self.roi_tracker.update(cam_frame)
 
@@ -65,7 +59,13 @@ class Tracker(object):
             cv2.circle(cam_frame, (x_center, y_center), 0, (0, 255, 0), thickness=2)
             pos = (x_center, y_center)
             self.position.append(pos)
-            return cam_frame
+            return cam_frame, pos
+
+    def set_init_bb(self, init_bb):
+        self.init_bb = init_bb
+
+    def init_roi_tracker(self, cam_frame):
+        self.roi_tracker.init(cam_frame, self.init_bb)
 
     def plot_track(self):
         for pos in self.position:
@@ -75,6 +75,14 @@ class Tracker(object):
 
     def get_position(self):
         return self.position
+
+    def get_velocity(self):
+        self.compute_velocity()
+        return self.velocity
+
+    def get_accel(self):
+        self.compute_accel()
+        return self.accel
 
     def compute_velocity(self):
         fps = self.cap.get(cv2.CAP_PROP_FPS)
@@ -86,10 +94,6 @@ class Tracker(object):
             v_y = dy/dt
             self.velocity.append((v_x, v_y))
 
-    def get_velocity(self):
-        self.compute_velocity()
-        return self.velocity
-
     def compute_accel(self):
         fps = self.cap.get(cv2.CAP_PROP_FPS)
         dt = 1 / fps
@@ -98,7 +102,3 @@ class Tracker(object):
             acc_x = (vel[-1][0] - vel[-2][0]) / dt
             acc_y = (vel[-1][1] - vel[-2][1]) / dt
             self.accel.append((acc_x, acc_y))
-
-    def get_accel(self):
-        self.compute_accel()
-        return self.accel
