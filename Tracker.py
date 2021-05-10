@@ -14,6 +14,8 @@ class Tracker(object):
         self.velocity.append(None)
         self.accel = deque(maxlen=128)
         self.accel.append(None)
+        self.roi_tracker = cv2.TrackerCSRT_create()
+        self.init_bb = None
 
     def track_contours(self, cam_frame):
         lt = np.array([65, 33, 71])
@@ -44,6 +46,20 @@ class Tracker(object):
         #     thickness = int(np.sqrt(64 / float(i + 1)) * 2.5)
         #     cv2.line(cam_frame, self.position[i - 1], self.position[i], (0, 255, 0), thickness)
         return cam_frame
+
+    def set_init_bb(self, init_bb):
+        self.init_bb = init_bb
+
+    def init_roi_tracker(self, cam_frame):
+        self.roi_tracker.init(cam_frame, self.init_bb)
+
+    def track_roi(self, cam_frame):
+        (success, box) = self.roi_tracker.update(cam_frame)
+
+        if success:
+            (x, y, w, h) = [int(v) for v in box]
+            cv2.rectangle(cam_frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
+            return cam_frame
 
     def plot_track(self):
         for pos in self.position:
