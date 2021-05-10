@@ -7,7 +7,7 @@ import imutils
 
 if __name__ == "__main__":
     current_dir = pathlib.Path(__file__).parent.absolute()
-    vid = os.path.join(current_dir, "shot2.mp4")
+    vid = os.path.join(current_dir, "shot3.mp4")
 
     cap = cv2.VideoCapture(vid)
     tracker = Tracker(cap)
@@ -19,13 +19,13 @@ if __name__ == "__main__":
             break
         frame = imutils.resize(frame, 1000, 500)
         frame_nr = cap.get(cv2.CAP_PROP_POS_FRAMES)
+        cv2.imshow("Frame", frame)
         if tracker.init_bb is not None:
             frame, pos = tracker.track_roi(frame)
             pred_pos = kf.estimate_position(pos[0], pos[1])
             cv2.circle(frame, (pred_pos[0], pred_pos[1]), 20, [0, 255, 255], 2, 8)
             cv2.imshow("Frame", frame)
-        if frame_nr == 1:
-            cv2.imshow("Frame", frame) 
+        if cv2.waitKey(1) == ord("s"):
             tracker.set_init_bb(cv2.selectROI("Frame", frame, fromCenter=False,
                                               showCrosshair=True))
             tracker.init_roi_tracker(frame)
