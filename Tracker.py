@@ -59,6 +59,12 @@ class Tracker(object):
         if success:
             (x, y, w, h) = [int(v) for v in box]
             cv2.rectangle(cam_frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
+            x_center = int(x + (w / 2))
+            y_center = int(y + (h / 2))
+            cv2.circle(cam_frame, (x_center, y_center), 1, (0, 255, 0), thickness=2)
+            cv2.circle(cam_frame, (x_center, y_center), 0, (0, 255, 0), thickness=2)
+            pos = (x_center, y_center)
+            self.position.append(pos)
             return cam_frame
 
     def plot_track(self):
