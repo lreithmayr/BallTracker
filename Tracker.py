@@ -51,7 +51,7 @@ class Tracker(object):
             cv2.circle(cam_frame, (x_center, y_center), 0, (0, 255, 0), thickness=2)
             pos = (x_center, y_center)
             self.position.append(pos)
-            return cam_frame, pos
+            return pos
 
     def set_init_bb(self, init_bb):
         self.init_bb = init_bb
