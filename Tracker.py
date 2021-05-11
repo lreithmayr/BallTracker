@@ -2,7 +2,6 @@ from collections import deque
 import cv2
 import imutils
 import numpy as np
-from matplotlib import pyplot as plt
 
 
 class Tracker(object):
@@ -13,6 +12,7 @@ class Tracker(object):
         self.roi_tracker = cv2.TrackerCSRT_create()
         self.init_bb = None
         self.center = None
+        self.trace = None
 
     def track_contours(self, cam_frame):
         lt = np.array([0, 90, 70])
@@ -59,8 +59,5 @@ class Tracker(object):
     def init_roi_tracker(self, cam_frame):
         self.roi_tracker.init(cam_frame, self.init_bb)
 
-    def plot_track(self):
-        for pos in self.position:
-            y_neg = np.negative(pos[1])
-            plt.scatter(pos[0], y_neg)
-        plt.show()
+    def get_position(self):
+        return self.position
