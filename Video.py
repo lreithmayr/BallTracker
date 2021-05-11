@@ -4,7 +4,6 @@ import os
 from Tracker import Tracker
 from KalmanFilter import KalmanFilter
 import imutils
-import numpy as np
 
 
 if __name__ == "__main__":
