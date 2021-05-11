@@ -15,8 +15,8 @@ class Tracker(object):
         self.center = None
 
     def track_contours(self, cam_frame):
-        lt = np.array([65, 33, 71])
-        ut = np.array([90, 176, 255])
+        lt = np.array([0, 90, 70])
+        ut = np.array([18, 255, 250])
 
         blurred = cv2.GaussianBlur(cam_frame, (11, 11), 0)
         hsv = cv2.cvtColor(blurred, cv2.COLOR_BGR2HSV)
