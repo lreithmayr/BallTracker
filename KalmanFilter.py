@@ -12,7 +12,7 @@ class KalmanFilter(object):
         self.kf.measurementNoiseCov = 1e-3 * np.eye(2).astype(np.float32)
 
     def estimate_position(self, pos_x, pos_y):
-        measured = np.array([[np.float32(pos_x)], [np.float32(pos_y)]])
+        measured = np.array([np.float32(pos_x), np.float32(pos_y)])
         self.kf.correct(measured)
         predicted = self.kf.predict()
         return predicted
