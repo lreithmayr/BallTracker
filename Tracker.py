@@ -48,6 +48,7 @@ class Tracker(object):
         return cam_frame, radius
 
     def track_roi(self, cam_frame):
+        pos = None
         (success, box) = self.roi_tracker.update(cam_frame)
 
         if success:

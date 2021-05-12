@@ -39,7 +39,7 @@ if __name__ == "__main__":
             tracker.set_init_bb(cv2.selectROI("Frame", frame, fromCenter=False,
                                               showCrosshair=True))
             tracker.init_roi_tracker(frame)
-        if cv2.waitKey(50) == 27:
+        if cv2.waitKey(1) == 27:
             break
 
     cap.release()
