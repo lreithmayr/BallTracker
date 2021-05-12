@@ -8,7 +8,8 @@ class Tracker(object):
 
     def __init__(self, cap):
         self.cap = cap
-        self.position = deque(maxlen=128)
+        self.position_arr = []
+        self.position_dq = deque(maxlen=8)
         self.position_wc = deque(maxlen=16)
         self.roi_tracker = cv2.TrackerCSRT_create()
         self.init_bb = None
@@ -59,13 +60,14 @@ class Tracker(object):
             cv2.circle(cam_frame, (x_center, y_center), 1, (0, 255, 0), thickness=2)
             cv2.circle(cam_frame, (x_center, y_center), 0, (0, 255, 0), thickness=2)
             pos = (x_center, y_center)
-            self.position.append(pos)
+            self.position_arr.append(pos)
+            self.position_dq.append(pos)
 
-            for i in range(1, len(self.position)):
-                if self.position[i - 1] is None or self.position[i] is None:
+            for i in range(1, len(self.position_dq)):
+                if self.position_dq[i - 1] is None or self.position_dq[i] is None:
                     continue
                 thickness = int(np.sqrt(64 / float(i + 1)) * 2.5)
-                cv2.line(cam_frame, self.position[i - 1], self.position[i], (0, 255, 0), thickness)
+                cv2.line(cam_frame, self.position_dq[i - 1], self.position_dq[i], (0, 255, 0), thickness)
 
         return pos
 
@@ -76,7 +78,7 @@ class Tracker(object):
         self.roi_tracker.init(cam_frame, self.init_bb)
 
     def get_position(self):
-        return self.position
+        return self.position_arr
 
     def get_center(self):
         return self.center
