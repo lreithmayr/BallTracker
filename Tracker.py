@@ -9,7 +9,7 @@ class Tracker(object):
     def __init__(self, cap):
         self.cap = cap
         self.position_arr = []
-        self.position_dq = deque(maxlen=8)
+        self.position_dq = deque(maxlen=16)
         self.position_wc = deque(maxlen=16)
         self.roi_tracker = cv2.TrackerCSRT_create()
         self.init_bb = None
@@ -66,7 +66,7 @@ class Tracker(object):
             for i in range(1, len(self.position_dq)):
                 if self.position_dq[i - 1] is None or self.position_dq[i] is None:
                     continue
-                thickness = int(np.sqrt(64 / float(i + 1)) * 2.5)
+                thickness = int(np.sqrt(32 / float(i + 1)) * 2.5)
                 cv2.line(cam_frame, self.position_dq[i - 1], self.position_dq[i], (0, 255, 0), thickness)
 
         return pos
