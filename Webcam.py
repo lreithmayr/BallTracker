@@ -1,14 +1,13 @@
 import cv2
 import imutils
 from KalmanFilter import KalmanFilter
-from Tracker import Tracker
-# import numpy as np
-# from matplotlib import pyplot as plt
+from Tracker import ContourTracker
+
 
 if __name__ == "__main__":
     vid = "http://192.168.0.94:8080/video"
     cap = cv2.VideoCapture(vid)
-    tracker = Tracker(cap)
+    tracker = ContourTracker(cap)
     kf = KalmanFilter()
     predictions = []
 

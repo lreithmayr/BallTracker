@@ -2,19 +2,15 @@ from collections import deque
 import cv2
 import imutils
 import numpy as np
+from matplotlib import pyplot as plt
 
 
-class Tracker(object):
+class ContourTracker(object):
 
     def __init__(self, cap):
         self.cap = cap
-        self.position_arr = []
-        self.position_dq = deque(maxlen=16)
         self.position_wc = deque(maxlen=16)
-        self.roi_tracker = cv2.TrackerCSRT_create()
-        self.init_bb = None
         self.center = None
-        self.trace = None
 
     def track_contours(self, cam_frame):
         radius = None
@@ -48,6 +44,19 @@ class Tracker(object):
 
         return cam_frame, radius
 
+    def get_center(self):
+        return self.center
+
+
+class ROITracker(object):
+
+    def __init__(self, cap):
+        self.cap = cap
+        self.position_arr = []
+        self.position_dq = deque(maxlen=16)
+        self.roi_tracker = cv2.TrackerCSRT_create()
+        self.init_bb = None
+
     def track_roi(self, cam_frame):
         pos = None
         (success, box) = self.roi_tracker.update(cam_frame)
@@ -80,5 +89,14 @@ class Tracker(object):
     def get_position(self):
         return self.position_arr
 
-    def get_center(self):
-        return self.center
+    def plot_trace(self, predictions):
+        plt_act = None
+        plt_pred = None
+        for (pos, pred) in zip(self.get_position(), predictions):
+            y_neg = np.negative(pos[1])
+            y_neg_pred = np.negative(pred[1])
+            plt_act = plt.scatter(pos[0], y_neg, marker=6, c="indianred", label="Actual Position")
+            plt_pred = plt.scatter(pred[0], y_neg_pred, marker="x", c="mediumseagreen", label="Predicted Position")
+
+        plt.legend(handles=[plt_act, plt_pred])
+        plt.show()

@@ -1,11 +1,9 @@
 import pathlib
 import cv2
 import os
-from Tracker import Tracker
+from Tracker import ROITracker
 from KalmanFilter import KalmanFilter
 import imutils
-from matplotlib import pyplot as plt
-import numpy as np
 
 
 if __name__ == "__main__":
@@ -13,7 +11,7 @@ if __name__ == "__main__":
     vid = os.path.join(current_dir, "videos/shot2.mp4")
 
     cap = cv2.VideoCapture(vid)
-    tracker = Tracker(cap)
+    tracker = ROITracker(cap)
     kf = KalmanFilter()
     predictions = []
 
@@ -45,13 +43,4 @@ if __name__ == "__main__":
     cap.release()
     cv2.destroyAllWindows()
 
-    plt_act = None
-    plt_pred = None
-    for (pos, pred) in zip(tracker.get_position(), predictions):
-        y_neg = np.negative(pos[1])
-        y_neg_pred = np.negative(pred[1])
-        plt_act = plt.scatter(pos[0], y_neg, marker=6, c="indianred", label="Actual Position")
-        plt_pred = plt.scatter(pred[0], y_neg_pred, marker="x", c="mediumseagreen", label="Predicted Position")
-
-    plt.legend(handles=[plt_act, plt_pred])
-    plt.show()
+    tracker.plot_trace(predictions)
