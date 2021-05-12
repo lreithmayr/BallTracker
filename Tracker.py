@@ -14,6 +14,7 @@ class ContourTracker(object):
 
     def track_contours(self, cam_frame):
         radius = None
+
         lt = np.array([75, 35, 85])
         ut = np.array([90, 215, 255])
 
