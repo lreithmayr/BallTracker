@@ -8,7 +8,7 @@ class Tracker(object):
 
     def __init__(self, cap):
         self.cap = cap
-        self.position = deque(maxlen=128)
+        self.position = deque(maxlen=32)
         self.roi_tracker = cv2.TrackerCSRT_create()
         self.init_bb = None
         self.center = None
@@ -38,6 +38,12 @@ class Tracker(object):
                 cv2.circle(cam_frame, (int(x), int(y)), int(radius), (0, 255, 255), 2)
                 cv2.circle(cam_frame, self.center, 5, (0, 0, 255), -1)
 
+        for i in range(1, len(self.position)):
+            if self.position[i - 1] is None or self.position[i] is None:
+                continue
+            thickness = int(np.sqrt(32 / float(i + 1)) * 2.5)
+            cv2.line(cam_frame, self.position[i - 1], self.position[i], (0, 255, 0), thickness)
+
         return cam_frame, radius
 
     def track_roi(self, cam_frame):
@@ -52,6 +58,13 @@ class Tracker(object):
             cv2.circle(cam_frame, (x_center, y_center), 0, (0, 255, 0), thickness=2)
             pos = (x_center, y_center)
             self.position.append(pos)
+
+            for i in range(1, len(self.position)):
+                if self.position[i - 1] is None or self.position[i] is None:
+                    continue
+                thickness = int(np.sqrt(32 / float(i + 1)) * 2.5)
+                cv2.line(cam_frame, self.position[i - 1], self.position[i], (0, 255, 0), thickness)
+
             return pos
 
     def set_init_bb(self, init_bb):

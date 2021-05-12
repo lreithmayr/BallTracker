@@ -16,6 +16,7 @@ if __name__ == "__main__":
     tracker = Tracker(cap)
     kf = KalmanFilter()
     predictions = []
+    pred_circles = []
 
     while True:
         check, frame = cap.read()
@@ -31,8 +32,8 @@ if __name__ == "__main__":
             # err_x = 2 * np.sqrt(kf.get_errorCovPos()[0][0])
             # err_y = 2 * np.sqrt(kf.get_errorCovPos()[1][1])
             # uncert = (err_x + err_y) / 2
-            cv2.circle(frame, (pred_pos[0], pred_pos[1]), 20, [0, 255, 255], 2, 8)
             # cv2.circle(frame, (pred_pos[0], pred_pos[1]), int(uncert), [0, 45, 255], 2, 8)
+            cv2.circle(frame, (pred_pos[0], pred_pos[1]), 15, [0, 45, 255], 2, 8)
             predictions.append((pred_pos[0], pred_pos[1]))
             cv2.imshow("Frame", frame)
         if frame_nr == 1:
