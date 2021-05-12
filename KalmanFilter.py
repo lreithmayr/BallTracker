@@ -13,7 +13,7 @@ class KalmanFilter(object):
         self.kf.errorCovPost = np.diag([10, 10, 10, 10])**2
 
     def estimate_position(self, pos_x, pos_y):
-        measured = np.array([np.float32(pos_x), np.float32(pos_y)])
+        measured = np.array([[np.float32(pos_x)], [np.float32(pos_y)]])
         self.kf.correct(measured)
         predicted = self.kf.predict()
         return predicted
