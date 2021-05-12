@@ -15,8 +15,9 @@ class Tracker(object):
         self.trace = None
 
     def track_contours(self, cam_frame):
-        lt = np.array([0, 90, 70])
-        ut = np.array([18, 255, 250])
+        radius = None
+        lt = np.array([75, 35, 85])
+        ut = np.array([90, 215, 255])
 
         blurred = cv2.GaussianBlur(cam_frame, (11, 11), 0)
         hsv = cv2.cvtColor(blurred, cv2.COLOR_BGR2HSV)
@@ -37,7 +38,7 @@ class Tracker(object):
                 cv2.circle(cam_frame, (int(x), int(y)), int(radius), (0, 255, 255), 2)
                 cv2.circle(cam_frame, self.center, 5, (0, 0, 255), -1)
 
-        return cam_frame, self.center
+        return cam_frame, radius
 
     def track_roi(self, cam_frame):
         (success, box) = self.roi_tracker.update(cam_frame)
@@ -61,3 +62,6 @@ class Tracker(object):
 
     def get_position(self):
         return self.position
+
+    def get_center(self):
+        return self.center
