@@ -7,7 +7,6 @@ import imutils
 from matplotlib import pyplot as plt
 import numpy as np
 
-
 if __name__ == "__main__":
     current_dir = pathlib.Path(__file__).parent.absolute()
     vid = os.path.join(current_dir, "shot2.mp4")
@@ -40,8 +39,6 @@ if __name__ == "__main__":
 
     cap.release()
     cv2.destroyAllWindows()
-
-    print(predictions[5][0])
 
     for (pos, pred) in zip(tracker.get_position(), predictions):
         y_neg = np.negative(pos[1])
