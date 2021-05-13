@@ -7,9 +7,8 @@ from matplotlib import pyplot as plt
 
 class ContourTracker(object):
 
-    def __init__(self, cap):
-        self.cap = cap
-        self.position_wc = deque(maxlen=16)
+    def __init__(self):
+        self.position = deque(maxlen=16)
         self.center = None
 
     def track_contours(self, cam_frame):
@@ -31,17 +30,17 @@ class ContourTracker(object):
             ((x, y), radius) = cv2.minEnclosingCircle(c)
             moments = cv2.moments(c)
             self.center = (int(moments["m10"] / moments["m00"]), int(moments["m01"] / moments["m00"]))
-            self.position_wc.append(self.center)
+            self.position.append(self.center)
 
             if radius > 10:
                 cv2.circle(cam_frame, (int(x), int(y)), int(radius), (0, 255, 255), 2)
                 cv2.circle(cam_frame, self.center, 5, (0, 0, 255), -1)
 
-        for i in range(1, len(self.position_wc)):
-            if self.position_wc[i - 1] is None or self.position_wc[i] is None:
+        for i in range(1, len(self.position)):
+            if self.position[i - 1] is None or self.position[i] is None:
                 continue
             thickness = int(np.sqrt(64 / float(i + 1)) * 2.5)
-            cv2.line(cam_frame, self.position_wc[i - 1], self.position_wc[i], (0, 255, 0), thickness)
+            cv2.line(cam_frame, self.position[i - 1], self.position[i], (0, 255, 0), thickness)
 
         return cam_frame, radius
 
@@ -51,8 +50,7 @@ class ContourTracker(object):
 
 class ROITracker(object):
 
-    def __init__(self, cap):
-        self.cap = cap
+    def __init__(self):
         self.position_arr = []
         self.position_dq = deque(maxlen=16)
         self.roi_tracker = cv2.TrackerCSRT_create()
@@ -87,13 +85,13 @@ class ROITracker(object):
     def init_roi_tracker(self, cam_frame):
         self.roi_tracker.init(cam_frame, self.init_bb)
 
-    def get_position(self):
+    def get_position_arr(self):
         return self.position_arr
 
     def plot_trace(self, predictions):
         plt_act = None
         plt_pred = None
-        for (pos, pred) in zip(self.get_position(), predictions):
+        for (pos, pred) in zip(self.get_position_arr(), predictions):
             y_neg = np.negative(pos[1])
             y_neg_pred = np.negative(pred[1])
             plt_act = plt.scatter(pos[0], y_neg, marker=6, c="indianred", label="Actual Position")
