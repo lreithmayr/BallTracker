@@ -11,7 +11,7 @@ if __name__ == "__main__":
     vid = os.path.join(current_dir, "videos/shot2.mp4")
 
     cap = cv2.VideoCapture(vid)
-    tracker = ROITracker(cap)
+    tracker = ROITracker()
     kf = KalmanFilter()
     predictions = []
 
@@ -19,24 +19,22 @@ if __name__ == "__main__":
         check, frame = cap.read()
         if not check:
             break
+
         frame = imutils.resize(frame, 1000, 500)
         frame_nr = cap.get(cv2.CAP_PROP_POS_FRAMES)
         cv2.imshow("Frame", frame)
 
-        if tracker.init_bb is not None:
-            pos = tracker.track_roi(frame)
-            pred_pos = kf.estimate_position(pos[0], pos[1])
-            # err_x = 2 * np.sqrt(kf.get_errorCovPos()[0][0])
-            # err_y = 2 * np.sqrt(kf.get_errorCovPos()[1][1])
-            # uncert = (err_x + err_y) / 2
-            # cv2.circle(frame, (pred_pos[0], pred_pos[1]), int(uncert), [0, 45, 255], 2, 8)
-            cv2.circle(frame, (pred_pos[0], pred_pos[1]), 15, [0, 45, 255], 2, 8)
-            predictions.append((pred_pos[0], pred_pos[1]))
-            cv2.imshow("Frame", frame)
         if frame_nr == 1:
             tracker.set_init_bb(cv2.selectROI("Frame", frame, fromCenter=False,
                                               showCrosshair=True))
             tracker.init_roi_tracker(frame)
+
+        if tracker.init_bb is not None:
+            pos = tracker.track_roi(frame)
+            pred_pos = kf.estimate_position(pos[0], pos[1], frame)
+            predictions.append((pred_pos[0], pred_pos[1]))
+            cv2.imshow("Frame", frame)
+
         if cv2.waitKey(1) == 27:
             break
 

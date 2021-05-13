@@ -7,7 +7,7 @@ from Tracker import ContourTracker
 if __name__ == "__main__":
     vid = "http://192.168.0.94:8080/video"
     cap = cv2.VideoCapture(vid)
-    tracker = ContourTracker(cap)
+    tracker = ContourTracker()
     kf = KalmanFilter()
     predictions = []
 
@@ -19,9 +19,7 @@ if __name__ == "__main__":
         cv2.imshow("Frame", frame)
 
         if tracker.center is not None:
-            pred_pos = kf.estimate_position(pos[0], pos[1])
-            if radius is not None:
-                cv2.circle(frame, (pred_pos[0], pred_pos[1]), int(radius), [0, 60, 255], 2, 8)
+            pred_pos = kf.estimate_position(pos[0], pos[1], frame, radius=radius)
             predictions.append(pred_pos)
             cv2.imshow("Frame", frame)
 
