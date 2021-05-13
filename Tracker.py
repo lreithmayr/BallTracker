@@ -36,11 +36,8 @@ class ContourTracker(object):
                 cv2.circle(cam_frame, (int(x), int(y)), int(radius), (0, 255, 255), 2)
                 cv2.circle(cam_frame, self.center, 5, (0, 0, 255), -1)
 
-        for i in range(1, len(self.position)):
-            if self.position[i - 1] is None or self.position[i] is None:
-                continue
-            thickness = int(np.sqrt(64 / float(i + 1)) * 2.5)
-            cv2.line(cam_frame, self.position[i - 1], self.position[i], (0, 255, 0), thickness)
+        [cv2.line(cam_frame, self.position[i - 1], self.position[i], (0, 255, 0),
+                  int(np.sqrt(32 / float(i + 1)) * 2.5)) for i in range(1, len(self.position))]
 
         return cam_frame, radius
 
@@ -71,11 +68,8 @@ class ROITracker(object):
             self.position_arr.append(pos)
             self.position_dq.append(pos)
 
-            for i in range(1, len(self.position_dq)):
-                if self.position_dq[i - 1] is None or self.position_dq[i] is None:
-                    continue
-                thickness = int(np.sqrt(32 / float(i + 1)) * 2.5)
-                cv2.line(cam_frame, self.position_dq[i - 1], self.position_dq[i], (0, 255, 0), thickness)
+            [cv2.line(cam_frame, self.position_dq[i - 1], self.position_dq[i], (0, 255, 0),
+                      int(np.sqrt(32 / float(i + 1)) * 2.5)) for i in range(1, len(self.position_dq))]
 
         return pos
 
