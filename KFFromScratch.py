@@ -27,7 +27,7 @@ class KFFromScratch(object):
                 0 0 0 1]       vel_y(k-1)]         0           dt]
 
 
-
+             =    F        *      x(k-1)     +           B                *         a(k)
 
 
     """
