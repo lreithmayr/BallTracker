@@ -2,8 +2,9 @@ import pathlib
 import cv2
 import os
 from Tracker import ROITracker
-from KalmanFilter import KalmanFilter
+from KFFromScratch import KF
 import imutils
+import numpy as np
 
 
 if __name__ == "__main__":
@@ -15,7 +16,7 @@ if __name__ == "__main__":
 
     fps = int(cap.get(cv2.CAP_PROP_FPS))
     dt = 1 / fps
-    kf = KalmanFilter(dt)
+    kf = KF(dt)
 
     predictions = []
 
@@ -35,9 +36,11 @@ if __name__ == "__main__":
 
         if tracker.init_bb is not None:
             pos = tracker.track_roi(frame)
-            pred_pos = kf.estimate_position(pos[0], pos[1], frame)
-            predictions.append((pred_pos[0], pred_pos[1]))
-            kf.draw_estimation_error(frame)
+            x_updt, p_updt = kf.predict(np.array([pos[0], pos[1]]).reshape(2, 1))
+            cv2.circle(frame, (x_updt[0], x_updt[1]), 15, [0, 20, 255], 2, 8)
+            #  pos = x_updt_i
+            # predictions.append((pred_pos[0], pred_pos[1]))
+            # kf.draw_estimation_error(frame)
             cv2.imshow("Frame", frame)
 
         if cv2.waitKey(1) == 27:
