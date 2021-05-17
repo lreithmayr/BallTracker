@@ -5,9 +5,10 @@ import inspect
 
 class KalmanFilter(object):
 
-    def __init__(self):
+    def __init__(self, dt):
         self.kf = cv2.KalmanFilter(4, 2)
-        self.kf.transitionMatrix = np.array([[1, 0, 1, 0], [0, 1, 0, 1], [0, 0, 1, 0], [0, 0, 0, 1]], np.float32)
+        self.kf.transitionMatrix = np.array([[1, 0, dt, 0], [0, 1, 0, dt], [0, 0, 1, 0], [0, 0, 0, 1]], np.float32)
+        self.kf.controlMatrix = np.array([[0.5 * (dt**2), 0], [0, 0.5 * (dt**2)], [dt, 0], [0, dt]], np.float32)
         self.kf.measurementMatrix = np.array([[1, 0, 0, 0], [0, 1, 0, 0]], np.float32)
         self.kf.processNoiseCov = 3e5 * np.eye(4).astype(np.float32)
         self.kf.measurementNoiseCov = 1e-3 * np.eye(2).astype(np.float32)

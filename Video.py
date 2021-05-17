@@ -12,7 +12,8 @@ if __name__ == "__main__":
 
     cap = cv2.VideoCapture(vid)
     tracker = ROITracker()
-    kf = KalmanFilter()
+    dt = 1 / cap.get(cv2.CAP_PROP_FPS)
+    kf = KalmanFilter(dt=dt)
     predictions = []
 
     while True:
