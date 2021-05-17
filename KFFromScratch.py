@@ -7,10 +7,10 @@ class KFFromScratch(object):
 
     State vector:
 
-    x(k) = [pos_x(k)
-            pos_y(k)
-            vel_x(k)
-            vel_y(k)]
+        x(k) = [pos_x(k)
+                pos_y(k)
+                vel_x(k)
+                vel_y(k)]
 
     Transition model:
 
