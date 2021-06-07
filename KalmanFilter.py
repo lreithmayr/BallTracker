@@ -42,7 +42,7 @@ class KalmanFilter(object):
 
         # Handling call by Video or Webcam
         if "Video" in self.caller_name:
-            cv2.circle(cam_frame, (self.predicted[0], self.predicted[1]), 15, [0, 20, 255], 2, 8)
+            cv2.circle(cam_frame, (int(self.predicted[0]), int(self.predicted[1])), 15, [0, 20, 255], 2, 8)
         elif "Webcam" in self.caller_name and radius is not None:
             cv2.circle(cam_frame, (self.predicted[0], self.predicted[1]), int(radius), [0, 45, 255], 2, 8)
         return self.predicted
@@ -54,4 +54,4 @@ class KalmanFilter(object):
         err_x = 2 * np.sqrt(self.get_error_cov_pre()[0][0])
         err_y = 2 * np.sqrt(self.get_error_cov_pre()[1][1])
         uncert = (err_x + err_y) / 2
-        cv2.circle(frame, (self.predicted[0], self.predicted[1]), int(uncert), [0, 45, 255], 2, 8)
+        cv2.circle(frame, (int(self.predicted[0]), int(self.predicted[1])), int(uncert), [0, 45, 255], 2, 8)

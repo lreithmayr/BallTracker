@@ -37,10 +37,10 @@ if __name__ == "__main__":
             pos = tracker.track_roi(frame)
             pred_pos = kf.estimate_position(pos[0], pos[1], frame)
             predictions.append((pred_pos[0], pred_pos[1]))
-            kf.draw_estimation_error(frame)
+            # kf.draw_estimation_error(frame)
             cv2.imshow("Frame", frame)
 
-        if cv2.waitKey(1) == 27:
+        if cv2.waitKey(10) == 27:
             break
 
     cap.release()
